@@ -31,31 +31,36 @@ const initialNodes: Node[] = [
         id: '1',
         sourcePosition: Position.Right,
         type: 'input',
-        data: { label: 'Start'},
+        data: { label: 'Start', },
         position: { x: 0, y: 0},
+        
     },
     { 
         id: '2',
-        data: { label: 'Node 1' }, 
+        data: { label: 'Node 1', question: 'what is a' }, 
         type: 'textUpdater',
         position: { x: 5, y: 5 }, 
-        // style: { 
-        //     border: '1px solid black',
-        //     width: '100px'
-        // } 
     },
     { 
         id: '3', 
         type: 'inputNode',
-        data: { label: 'Node 2' }, 
+        data: { label: 'Node 2', answer: 'alphabet' }, 
         position: { x: 5, y: 5 }
     },
+    {
+        id: '4',
+        // type: 'output',
+        targetPosition: Position.Left,
+        data: { label: 'feedback', feedback: 'feedback from gpt'},
+        position: { x: 100, y: 100}
+    }
     
 ];
 
 const initialEdges: Edge[] = [
     { id: 'e1-2', source: '1', target: '2' },
-    { id: 'e2-3', source: '2', target: '3'}
+    { id: 'e2-3', source: '2', target: '3'},
+    { id: 'e3-4', source: '3', target: '4'}
 ];
 
 const fitViewOptions: FitViewOptions = {

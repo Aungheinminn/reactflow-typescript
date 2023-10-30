@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { Handle, NodeProps, Position } from 'reactflow';
 import classes from './InputNode.module.css'
 
-type Value = string | number
+// type Value = string | number
 
 function InputNode({ isConnectable }: NodeProps) {
 //   const [ value, setValue] = useState< Value | undefined >('')

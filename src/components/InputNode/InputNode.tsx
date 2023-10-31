@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { Handle, NodeProps, Position } from 'reactflow';
 import classes from './InputNode.module.css'
 

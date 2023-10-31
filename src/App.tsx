@@ -1,20 +1,21 @@
-import { useState, useCallback } from 'react';
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useCallback, useRef } from 'react';
 import ReactFlow, {
     Controls,
     addEdge,
     FitViewOptions,
-    applyNodeChanges,
-    applyEdgeChanges,
     Node,
     Edge,
-    OnNodesChange,
-    OnEdgesChange,
     OnConnect,
     DefaultEdgeOptions,
     NodeTypes,
     Position,
     Panel,
     useReactFlow,
+    useNodesState,
+    useEdgesState,
+    updateEdge,
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
@@ -31,7 +32,7 @@ const initialNodes: Node[] = [
         id: '1',
         sourcePosition: Position.Right,
         type: 'input',
-        data: { label: 'Start', },
+        data: { label: 'Start', toolbarPosition: 'Position.Top' },
         position: { x: 0, y: 0},
         
     },
@@ -86,29 +87,23 @@ const getNodeId = () => `randomnode_${+new Date()}`;
 
 function App() {
 
-  const [nodes, setNodes] = useState<Node[]>(initialNodes);
-  const [edges, setEdges] = useState<Edge[]>(initialEdges);
+  const edgeUpdateSuccessful = useRef(true);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [rfInstance, setRfInstance] = useState<ToObject | null>(null);
-  const { setViewport } = useReactFlow();
-
-  const onNodesChange: OnNodesChange = useCallback(
-    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    [setNodes]
-  );
-  const onEdgesChange: OnEdgesChange = useCallback(
-    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    [setEdges]
-  );
+  const { setViewport } = useReactFlow();    
+  const element = useRef(null)
+  
   const onConnect: OnConnect = useCallback(
     (connection) => setEdges((eds) => addEdge(connection, eds)),
     [setEdges]
   );
 
   const onSave = useCallback(() => {      
-    console.log()
 
     if (rfInstance) {
       const flow = rfInstance?.toObject();
+      console.log(flow)
       localStorage.setItem(flowKey, JSON.stringify(flow));
     }
   }, [rfInstance]);
@@ -126,10 +121,11 @@ function App() {
     };
 
     restoreFlow();
-  }, [setNodes, setViewport]);
+  }, [setEdges, setNodes, setViewport]);
 
   const exportData = () => {
     if(rfInstance){
+        // eslint-disable-next-line no-var
         var flow = rfInstance.toObject()
     }
     const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
@@ -153,7 +149,29 @@ function App() {
     };
     setNodes((nds) => nds.concat(newNode));
   }, [setNodes]);
-  
+
+  const onEdgeUpdateStart = useCallback(() => {
+    edgeUpdateSuccessful.current = false;
+  }, []);
+
+  const onEdgeUpdate = useCallback((oldEdge: any, newConnection: any) => {
+    edgeUpdateSuccessful.current = true;
+    setEdges((els) => updateEdge(oldEdge, newConnection, els));
+  }, [setEdges]);
+
+  const onEdgeUpdateEnd = useCallback((_: any, edge: { id: string; }) => {
+    if (!edgeUpdateSuccessful.current) {
+      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+    }
+
+    edgeUpdateSuccessful.current = true;
+  }, [setEdges]);
+
+  const onNodeClick = (e: any) => {
+    console.log(e.target)
+    console.log(nodes.filter(node => node.id === '1'))    
+  }
+
 
   return (
     <div style={{ height: '800px'}}>
@@ -161,13 +179,19 @@ function App() {
             nodes={nodes}
             edges={edges}
             onNodesChange={onNodesChange}
+            onNodeClick={onNodeClick}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            // snapToGrid
+            onEdgeUpdate={onEdgeUpdate}
+            onEdgeUpdateStart={onEdgeUpdateStart}
+            onEdgeUpdateEnd={onEdgeUpdateEnd}
             fitView
             fitViewOptions={fitViewOptions}
             defaultEdgeOptions={defaultEdgeOptions}
             nodeTypes={nodeTypes}
             onInit={setRfInstance}
+            ref={element}
         >
             <Panel position="top-right">
                 <button onClick={onSave}>save</button>

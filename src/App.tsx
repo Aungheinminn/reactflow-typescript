@@ -30,7 +30,6 @@ import InputNode from './components/InputNode/InputNode';
 const initialNodes: Node[] = [
     {
         id: '1',
-        sourcePosition: Position.Right,
         type: 'display',
         data: { label: 'what is 1 + 1' },
         position: { x: 0, y: 0},

@@ -16,7 +16,7 @@ function InputNode({ isConnectable }: NodeProps) {
     <div className={classes.textUpdaterNode}>
       <Handle type="target" position={Position.Left} isConnectable={isConnectable} />
       <div>
-        <label htmlFor="text">Input</label>
+        <label htmlFor="text">Type Answer</label>
         <input id="text" name="text" onChange={onChange} className="nodrag" />
       </div>
       <Handle type="source" position={Position.Right} id="b" isConnectable={isConnectable} />

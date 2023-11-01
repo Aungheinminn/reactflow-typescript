@@ -33,24 +33,28 @@ const initialNodes: Node[] = [
         sourcePosition: Position.Right,
         type: 'input',
         data: { label: 'Start', toolbarPosition: 'Position.Top' },
+        type: 'display',
+        data: { label: 'what is 1 + 1' },
         position: { x: 0, y: 0},
         
     },
     { 
         id: '2',
-        data: { label: 'Node 1', question: 'what is a' }, 
-        type: 'textUpdater',
+        data: { label: 'Node 1'}, 
+        type: 'inputNode',
         position: { x: 5, y: 5 }, 
     },
     { 
         id: '3', 
-        type: 'inputNode',
-        data: { label: 'Node 2', answer: 'alphabet' }, 
-        position: { x: 5, y: 5 }
+        type: 'processNode',
+        data: { label: 'Process', rightAnswer: '2' }, 
+        position: { x: 5, y: 5 },
+        targetPosition: Position.Left,
+        sourcePosition: Position.Right
     },
     {
         id: '4',
-        // type: 'output',
+        type: 'feedback',
         targetPosition: Position.Left,
         data: { label: 'feedback', feedback: 'feedback from gpt'},
         position: { x: 100, y: 100}

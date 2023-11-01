@@ -33,7 +33,7 @@ const initialNodes: Node[] = [
         type: 'display',
         data: { label: 'what is 1 + 1' },
         position: { x: 0, y: 0},
-        
+        sourcePosition: Position.Right,
     },
     { 
         id: '2',
@@ -55,8 +55,7 @@ const initialNodes: Node[] = [
         targetPosition: Position.Left,
         data: { label: 'feedback', feedback: 'feedback from gpt'},
         position: { x: 100, y: 100}
-    }
-    
+    },    
 ];
 
 const initialEdges: Edge[] = [

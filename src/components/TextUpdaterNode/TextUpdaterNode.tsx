@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { Handle, NodeProps, NodeToolbar, Position, useNodeId } from 'reactflow';
 import classes from './TextUpdaterNode.module.css'
 

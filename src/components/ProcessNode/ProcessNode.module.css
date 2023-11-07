@@ -1,0 +1,58 @@
+.textUpdaterNode {
+    width: 130px;
+  height: 100%;
+  border: 1px solid #eee;
+  /* padding: 5px; */
+  border-radius: 5px;
+  margin: 0;
+  background: cadetblue;
+  position: relative;
+}
+
+.textUpdaterNode label {
+  display: block;
+  color: #777;
+  font-size: 12px;
+}
+.wrap{
+    display: 100%;
+}
+.labelDiv{
+    width: 100%;
+    background-color: antiquewhite;
+}
+.labelDiv label{
+    padding: 5px;
+    margin-left: 5px;
+}
+.option{
+    height: 40px;
+}
+.option div{
+    width: 100%;
+    margin-top: 5px;
+    padding: 5px 10px;
+}
+.handle1,.handle3,.handle4,.handle5{
+    background-color: skyblue;
+}
+.handle2{
+    position: absolute;
+    top: 10%;
+    left: -4px;
+}
+.handle3{
+    position: absolute;
+    top: 35%;
+    right: -4px;
+}
+.handle4{
+    position: absolute;
+    top: 60%;
+    right: -4px;
+}
+.handle6{
+    position: absolute;
+    left: 90%;
+    /* top: -4px; */
+}

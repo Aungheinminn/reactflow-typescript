@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, MouseEvent } from 'react';
+import { shallow } from 'zustand/shallow';
+import { datas } from './sample';
 import ReactFlow, {
     Controls,
-    addEdge,
     FitViewOptions,
     Node,
     Edge,
@@ -16,53 +17,28 @@ import ReactFlow, {
     useNodesState,
     useEdgesState,
     updateEdge,
+    addEdge,
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
-
+// import useStoreWithEqualityFn from 'zustand/traditional/useStore';
 import TextUpdaterNode from './components/TextUpdaterNode/TextUpdaterNode';
 import InputNode from './components/InputNode/InputNode';
+import ConditionNode from './components/ConditionNode/ConditionNode';
 
 // import CustomNode from './CustomNode';
 
+import useStore from './store';
+import ProcessNode from './components/ProcessNode/ProcessNode';
+import DisplayNode from './components/DisplayNode/DisplayNode';
 
-
-const initialNodes: Node[] = [
-    {
-        id: '1',
-        type: 'display',
-        data: { label: 'what is 1 + 1' },
-        position: { x: 0, y: 0},
-        sourcePosition: Position.Right,
-    },
-    { 
-        id: '2',
-        data: { label: 'Node 1'}, 
-        type: 'inputNode',
-        position: { x: 5, y: 5 }, 
-    },
-    { 
-        id: '3', 
-        type: 'processNode',
-        data: { label: 'Process', rightAnswer: '2' }, 
-        position: { x: 5, y: 5 },
-        targetPosition: Position.Left,
-        sourcePosition: Position.Right
-    },
-    {
-        id: '4',
-        type: 'feedback',
-        targetPosition: Position.Left,
-        data: { label: 'feedback', feedback: 'feedback from gpt'},
-        position: { x: 100, y: 100}
-    },    
-];
-
-const initialEdges: Edge[] = [
-    { id: 'e1-2', source: '1', target: '2' },
-    { id: 'e2-3', source: '2', target: '3'},
-    { id: 'e3-4', source: '3', target: '4'}
-];
+const selector = (state: { nodes: any; edges: any; onNodesChange: any; onEdgesChange: any; onConnect: any; }) => ({
+  nodes: state.nodes,
+  edges: state.edges,
+  onNodesChange: state.onNodesChange,
+  onEdgesChange: state.onEdgesChange,
+  onConnect: state.onConnect,
+});
 
 const fitViewOptions: FitViewOptions = {
   padding: 0.2,
@@ -73,56 +49,87 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 };
 
 const nodeTypes: NodeTypes = {
-  textUpdater: TextUpdaterNode,
-  inputNode: InputNode,
+    textUpdater: TextUpdaterNode,
+    inputNode: InputNode,
+    displayNode: DisplayNode,
+    conditionNode: ConditionNode,
+    processNode: ProcessNode
 };
 
 type ToObject = {
   toObject: () => any;
 };
 
-const flowKey = 'example-flow';
-const getNodeId = () => `randomnode_${+new Date()}`;
+
 
 
 function App() {
 
-  const edgeUpdateSuccessful = useRef(true);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [rfInstance, setRfInstance] = useState<ToObject | null>(null);
-  const { setViewport } = useReactFlow();    
-  const element = useRef(null)
-  
-  const onConnect: OnConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge(connection, eds)),
-    [setEdges]
-  );
+    const [rfInstance, setRfInstance] = useState<ToObject | null>(null);
+    const flowKey = 'nodesAndEdges'
 
-  const onSave = useCallback(() => {      
+    const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useStore(selector, shallow);
 
-    if (rfInstance) {
-      const flow = rfInstance?.toObject();
-      console.log(flow)
-      localStorage.setItem(flowKey, JSON.stringify(flow));
+    const setNodes = useStore((state) => state.setNodes);
+    const setEdges = useStore((state)=> state.setEdges)
+    const addNodes = useStore((state) => state.addNodes);
+    const addEdges = useStore((state)=> state.addEdges);
+
+
+    const handleRender = () =>{
+        datas.nodes.map(data=>addNodes(data))
+        datas.edges.map(data=>addEdges(data))
+
+        console.log(nodes, edges);
     }
-  }, [rfInstance]);
 
-  const onRestore = useCallback(() => {
-    const restoreFlow = async () => {
-      const flow = JSON.parse(localStorage.getItem(flowKey)!);
+    const handleStartNode = () => {
+        const newStartNode =  { id: Date.now().toString(), data: { label: 'Start' }, position: { x: 100, y: 100 }, type: 'input', sourcePosition: Position.Right }
+        addNodes(newStartNode)
+    }
 
-      if (flow) {
-        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-        setNodes(flow.nodes || []);
-        setEdges(flow.edges || []);
-        setViewport({ x, y, zoom });
-      }
+    const handleEndNode = () => {
+        const newEndNode = { id: Date.now().toString(), data: { label: 'End' }, position: { x: 100, y: 100 }, sourcePosition: Position.Right, targetPosition: Position.Left }
+        addNodes(newEndNode)
+    }
+
+    const handleDisplayNode = () => {
+        const newDisplayNode = { id: Date.now().toString(), data: { label: 'Display', feedback: 'result blah blah' }, position: { x: 100, y: 100 }, type: 'displayNode' }
+        addNodes(newDisplayNode);
+    }; 
+    const handleInputNode = () => {
+        const newInputNode = { id: Date.now().toString(), data: { label: 'New Node' }, position: { x: 100, y: 100 }, type: 'inputNode' }
+        addNodes(newInputNode)
+    }
+    const handleProcessNode = () => {
+        const newProcessNode = { id: Date.now().toString(), data: { label: 'New Node', processTypeId: '' }, position: { x: 100, y: 100 }, type: 'processNode' }
+        addNodes(newProcessNode)
+    }
+
+    const onSave = useCallback(() => {      
+
+        if (rfInstance) {
+        const flow = rfInstance?.toObject();
+        console.log(flow)
+        localStorage.setItem(flowKey, JSON.stringify(flow));
+        }
+    }, [rfInstance]);
+
+    const handleRestore = () => {
+        setNodes(nodes);
+        const restoreFlow = async () => {
+            const flow = JSON.parse(localStorage.getItem(flowKey)!);
+
+            if (flow) {
+                // const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+                setNodes(flow.nodes || []);
+                setEdges(flow.edges || []);
+            }
+        };
+
+        restoreFlow()
     };
-
-    restoreFlow();
-  }, [setEdges, setNodes, setViewport]);
-
+ 
   const exportData = () => {
     if(rfInstance){
         // eslint-disable-next-line no-var
@@ -138,39 +145,25 @@ function App() {
     link.click();
   };
 
-   const onAdd = useCallback(() => {
-    const newNode = {
-      id: getNodeId(),
-      data: { label: 'Added node' },
-      position: {
-        x: Math.random() * window.innerWidth - 100,
-        y: Math.random() * window.innerHeight,
-      },
-    };
-    setNodes((nds) => nds.concat(newNode));
-  }, [setNodes]);
+    // const handleConnect = (params: { element: any, target: any; }) => {
+    //     const { element, target } = params;
 
-  const onEdgeUpdateStart = useCallback(() => {
-    edgeUpdateSuccessful.current = false;
-  }, []);
+    //     console.log(target)
 
-  const onEdgeUpdate = useCallback((oldEdge: any, newConnection: any) => {
-    edgeUpdateSuccessful.current = true;
-    setEdges((els) => updateEdge(oldEdge, newConnection, els));
-  }, [setEdges]);
+    //      const targetNode = nodes.find((node: Node) => node.id === target);
+    //         if (targetNode) {
+    //         const updatedNodeData = {
+    //             ...targetNode.data,
+    //             customData: 'Data from Edge',
+    //         };
 
-  const onEdgeUpdateEnd = useCallback((_: any, edge: { id: string; }) => {
-    if (!edgeUpdateSuccessful.current) {
-      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
-    }
+    //         setNodes(
+    //             nodes.map((node: Node) => (node.id === target ? { ...node, data: updatedNodeData } : node))
+    //         )
+    //         }
+    // };
 
-    edgeUpdateSuccessful.current = true;
-  }, [setEdges]);
 
-  const onNodeClick = (e: any) => {
-    console.log(e.target)
-    console.log(nodes.filter(node => node.id === '1'))    
-  }
 
 
   return (
@@ -179,24 +172,28 @@ function App() {
             nodes={nodes}
             edges={edges}
             onNodesChange={onNodesChange}
-            onNodeClick={onNodeClick}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             // snapToGrid
-            onEdgeUpdate={onEdgeUpdate}
-            onEdgeUpdateStart={onEdgeUpdateStart}
-            onEdgeUpdateEnd={onEdgeUpdateEnd}
+            // onEdgeUpdate={onEdgeUpdate}
+            // onEdgeUpdateStart={onEdgeUpdateStart}
+            // onEdgeUpdateEnd={onEdgeUpdateEnd}
             fitView
             fitViewOptions={fitViewOptions}
             defaultEdgeOptions={defaultEdgeOptions}
             nodeTypes={nodeTypes}
             onInit={setRfInstance}
-            ref={element}
+            // ref={element}
         >
             <Panel position="top-right">
+                <button onClick={handleRender}>JSON render</button>
                 <button onClick={onSave}>save</button>
-                <button onClick={onRestore}>restore</button>
-                <button onClick={onAdd}>add node</button>
+                <button onClick={handleRestore}>restore</button>
+                <button onClick={handleStartNode}>startNode</button>
+                <button onClick={handleEndNode}>endNode</button>
+                <button onClick={handleDisplayNode}>displayNode</button>
+                <button onClick={handleInputNode}>inputNode</button>
+                <button onClick={handleProcessNode}>processNode</button>
                 <button onClick={exportData}>save as json</button>
             </Panel>
             <Controls />

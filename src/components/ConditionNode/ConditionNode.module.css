@@ -1,0 +1,53 @@
+
+.textUpdaterNode {
+  width: 100px;
+  /* height: 50px; */
+  border: 1px solid #eee;
+  padding: 5px;
+  border-radius: 5px;
+  background: white;
+  position: relative;
+}
+
+.textUpdaterNode label {
+  display: block;
+  color: #777;
+  font-size: 12px;
+}
+.textUpdaterNode {
+  position: relative;
+}
+.handle1Div, .handle2Div, .handle4Div{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: right;
+}
+.handle4Div{
+    text-align: left;
+    padding: 0 10px;
+}
+.label{
+    margin: 2px;
+}
+.handle1{
+    position: absolute;
+    top: 50%;
+    right: -4px;
+}
+.handle2{
+    position: absolute;
+    top: 75%;
+    right: -4px;
+}
+.handle3{
+    position: absolute;
+    top: 15%;
+    left: -4px;
+}
+.handle4{
+    position: absolute;
+    top: 35%;
+    left: 0px;
+}
+

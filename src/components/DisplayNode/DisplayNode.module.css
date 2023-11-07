@@ -1,0 +1,60 @@
+
+.textUpdaterNode {
+  height: 100%;
+  border: 1px solid #777;
+  /* padding: 5px; */
+  border-radius: 5px;
+  background-color: cadetblue;
+  position: relative;
+  /* padding: 0 25px; */
+}
+.display{
+    color: #777;
+    background-color: antiquewhite;
+    width: 100%;
+    padding: 5px 0;
+}
+.display span{
+    margin-left: 10px;
+}
+.textUpdaterNode label {
+  display: block;
+  color: #777;
+  font-size: 12px;
+}
+.textUpdaterNode {
+  position: relative;
+}
+
+.labelDiv{
+    width: 100%;
+    text-align: left;
+    padding: 5px 10px;
+}
+.labelDiv label{
+    color: aqua;
+}
+.handlerDiv{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.handle1{
+    position: absolute;
+    top: 50%;
+    left: -4px;
+}
+.handle2{
+    position: absolute;
+    top: 75%;
+    left: -4px;
+}
+
+/* .input1Div,.input2Div{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+} */
+.inputdiv div{
+    margin: 10px;
+}

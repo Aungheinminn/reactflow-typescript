@@ -1,23 +1,31 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Handle, NodeProps, Position } from 'reactflow';
 import classes from './InputNode.module.css'
 
-// type Value = string | number
+type Value = string | number
 
-function InputNode({ isConnectable }: NodeProps) {
-//   const [ value, setValue] = useState< Value | undefined >('')
+function InputNode({ isConnectable, data }: NodeProps) {
+  const [ value, setValue] = useState< Value | undefined >(data.initialValue || '')
   const onChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(evt.target.value);
-    // setValue(evt.target.value)
+    setValue(evt.target.value)  
+
   }, []);
+  console.log(data.label)
+    // data.label = value
 
 
   return (
     <div className={classes.textUpdaterNode}>
-      <Handle type="target" position={Position.Left} isConnectable={isConnectable} />
+      {/* <Handle type="target" position={Position.Left} isConnectable={isConnectable} /> */}
+
       <div>
-        <label htmlFor="text">Type Answer</label>
-        <input id="text" name="text" onChange={onChange} className="nodrag" />
+        <div className={classes.labelDiv}>
+            <label htmlFor="text">Type Question:</label>
+        </div>
+        <div className={classes.inputDiv}>
+                <input id="text" name="text" onChange={onChange} value={data.label} className="nodrag" />
+        </div>
+
       </div>
       <Handle type="source" position={Position.Right} id="b" isConnectable={isConnectable} />
     </div>
